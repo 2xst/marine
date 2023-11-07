@@ -1,5 +1,4 @@
-#[derive(Clone, Debug, sqlx::Type)]
-#[sqlx(transparent)]
+#[derive(Clone, Debug)]
 pub struct Id(u64);
 
 #[cfg(test)]

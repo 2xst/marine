@@ -1,8 +1,7 @@
-pub mod api;
+pub mod http;
 pub mod telemetry;
 
-mod adapters;
 mod app;
 mod config;
 mod domain;
-mod ports;
+mod services;

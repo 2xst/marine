@@ -1,30 +1,29 @@
 mod users;
 
-use crate::ports::{database::Database, hash::Hasher};
+use serde::Deserialize;
 
-#[derive(Clone, Default)]
-pub struct App<DB, H>
-where
-    DB: Database,
-    H: Hasher,
-{
-    database: DB,
-    hasher: H,
+use crate::services::{
+    database::{Database, DatabaseConfig},
+    hasher::{Hasher, HasherConfig},
+};
+
+#[derive(Clone)]
+pub struct App {
+    database: Database,
+    hasher: Hasher,
 }
 
-impl<DB, H> App<DB, H>
-where
-    DB: Database,
-    H: Hasher,
-{
-    pub fn with(database: DB, hasher: H) -> Self {
-        Self { database, hasher }
+#[derive(Clone, Debug, Deserialize)]
+pub struct AppConfig {
+    pub database: DatabaseConfig,
+    pub hasher: HasherConfig,
+}
+
+impl App {
+    #[tracing::instrument]
+    pub async fn new(config: AppConfig) -> anyhow::Result<Self> {
+        let database = Database::new(config.database)?;
+        let hasher = Hasher::new(config.hasher)?;
+        Ok(Self { database, hasher })
     }
 }
-
-#[cfg(test)]
-use crate::adapters::mocks::{database::MockDatabase, hash::MockHasher};
-
-#[cfg(test)]
-#[allow(unused)]
-type TestApp = App<MockDatabase, MockHasher>;

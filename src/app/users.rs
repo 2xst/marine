@@ -1,20 +1,12 @@
-use crate::{
-    domain::{
-        error::Result,
-        token::Token,
-        user::{NewUser, NewUserRequest},
-    },
-    ports::{database::Database, hash::Hasher},
+use crate::domain::{
+    error::Result,
+    token::Token,
+    user::{NewUser, NewUserRequest},
 };
 
 use super::App;
 
-impl<DB, H> App<DB, H>
-where
-    DB: Database,
-    H: Hasher,
-{
-    //TODO tests
+impl App {
     #[tracing::instrument(skip(self))]
     pub async fn signup(&mut self, req: NewUserRequest) -> Result<()> {
         let password_hash =

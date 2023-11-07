@@ -2,15 +2,9 @@ http:
   host: [127, 0, 0, 1]
   port: 8080
 
-mysql:
-  host: 127.0.0.1
-  port: 3306
-  user: root
-  password: root
-  database: mysql
-  require_ssl: false
+database:
 
-argon2:
+hasher:
   secret: ""
   memory_size: 16
   iterations: 1

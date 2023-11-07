@@ -3,8 +3,8 @@
 use std::net::SocketAddr;
 
 use hexagon::{
-    api::http::{HttpServer, HttpServerConfig},
-    telemetry::init_test_telemetry,
+    http::{HttpServer, HttpServerConfig},
+    telemetry::init_telemetry,
 };
 use reqwest::{Client, Method, RequestBuilder};
 
@@ -17,7 +17,7 @@ struct TestServer {
 
 impl TestServer {
     async fn start() -> anyhow::Result<Self> {
-        init_test_telemetry();
+        init_telemetry()?;
         std::env::set_var("HTTP__PORT", "0");
         let config = HttpServerConfig::init()?;
         let server = HttpServer::new(config).await?;

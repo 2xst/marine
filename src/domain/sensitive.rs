@@ -4,17 +4,10 @@ use secrecy::{
     zeroize::DefaultIsZeroes, CloneableSecret, DebugSecret, ExposeSecret,
     Secret, Zeroize,
 };
-use sqlx::{
-    encode::IsNull,
-    error::BoxDynError,
-    mysql::{MySqlTypeInfo, MySqlValueRef},
-    Decode, Encode, MySql, Type,
-};
 
 pub struct Sensitive<T: Zeroize>(Secret<T>);
 
-#[derive(Clone, Copy, Default, sqlx::Type)]
-#[sqlx(transparent)]
+#[derive(Clone, Copy, Default)]
 pub struct Zeroizable<T: Clone + Copy + Default>(pub T);
 
 impl<T: Zeroize> Sensitive<T> {
@@ -44,24 +37,6 @@ impl<T: DebugSecret + Zeroize> fmt::Debug for Sensitive<T> {
 impl<T: Zeroize> ExposeSecret<T> for Sensitive<T> {
     fn expose_secret(&self) -> &T {
         self.0.expose_secret()
-    }
-}
-
-impl<T: Zeroize + Type<MySql>> Type<MySql> for Sensitive<T> {
-    fn type_info() -> MySqlTypeInfo {
-        <T as Type<MySql>>::type_info()
-    }
-}
-
-impl<'q, T: Zeroize + Encode<'q, MySql>> Encode<'q, MySql> for Sensitive<T> {
-    fn encode_by_ref(&self, buf: &mut Vec<u8>) -> IsNull {
-        self.0.expose_secret().encode_by_ref(buf)
-    }
-}
-
-impl<'r, T: Zeroize + Decode<'r, MySql>> Decode<'r, MySql> for Sensitive<T> {
-    fn decode(value: MySqlValueRef<'r>) -> Result<Self, BoxDynError> {
-        Ok(Self(Secret::new(T::decode(value)?)))
     }
 }
 

@@ -1,7 +1,7 @@
 use axum::{extract::State, http::StatusCode, routing::post, Form, Router};
 
 use crate::{
-    api::app::App,
+    app::App,
     domain::{error::Result, user::NewUserRequest},
 };
 

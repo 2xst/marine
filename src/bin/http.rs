@@ -1,5 +1,5 @@
 use hexagon::{
-    api::http::{HttpServer, HttpServerConfig},
+    http::{HttpServer, HttpServerConfig},
     telemetry::init_telemetry,
 };
 

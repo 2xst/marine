@@ -10,9 +10,10 @@ use serde::Deserialize;
 use serde_aux::field_attributes::deserialize_number_from_string;
 use serde_with::serde_as;
 
-use crate::{api::app::App, config};
-
-use super::app::AppConfig;
+use crate::{
+    app::{App, AppConfig},
+    config,
+};
 
 #[serde_as]
 #[derive(Clone, Debug, Deserialize)]
@@ -60,10 +61,9 @@ impl HttpServer {
 }
 
 fn router() -> Router<App> {
-    let api_router = Router::new()
+    Router::new()
         .nest("/auth", auth::router())
-        .nest("/health_check", health_check::router());
-    Router::new().nest("/api", api_router)
+        .nest("/health_check", health_check::router())
 }
 
 impl HttpServerConfig {

@@ -6,7 +6,7 @@ use crate::TestServer;
 async fn server_responds() {
     let server = TestServer::start().await.unwrap();
     let res = server
-        .call(Method::GET, "/api/health_check")
+        .call(Method::GET, "/health_check")
         .send()
         .await
         .unwrap();

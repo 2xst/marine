@@ -6,16 +6,13 @@ use argon2::{
 use secrecy::{ExposeSecret, Secret};
 use serde::Deserialize;
 
-use crate::{
-    domain::{
-        error::{Error, Result},
-        password::{Password, PasswordHash},
-    },
-    ports::hash::Hasher,
+use crate::domain::{
+    error::{Error, Result},
+    password::{Password, PasswordHash},
 };
 
 #[derive(Clone)]
-pub struct Argon2Hasher {
+pub struct Hasher {
     secret: Secret<String>,
     algorithm: Algorithm,
     version: Version,
@@ -23,7 +20,7 @@ pub struct Argon2Hasher {
 }
 
 #[derive(Clone, Debug, Deserialize)]
-pub struct Argon2Config {
+pub struct HasherConfig {
     pub secret: Secret<String>,
     pub memory_size: u32,
     pub iterations: u32,
@@ -31,8 +28,8 @@ pub struct Argon2Config {
     pub output_length: Option<usize>,
 }
 
-impl Argon2Hasher {
-    pub fn new(config: Argon2Config) -> anyhow::Result<Self> {
+impl Hasher {
+    pub fn new(config: HasherConfig) -> anyhow::Result<Self> {
         let secret = config.secret;
         let algorithm = Algorithm::default();
         let version = Version::default();
@@ -50,20 +47,7 @@ impl Argon2Hasher {
         })
     }
 
-    fn hasher(&self) -> anyhow::Result<Argon2<'_>> {
-        Argon2::new_with_secret(
-            self.secret.expose_secret().as_bytes(),
-            self.algorithm,
-            self.version,
-            self.params.clone(),
-        )
-        .map_err(anyhow::Error::from)
-    }
-}
-
-//TODO tests
-impl Hasher for Argon2Hasher {
-    fn hash_password(&self, password: Password) -> Result<PasswordHash> {
+    pub fn hash_password(&self, password: Password) -> Result<PasswordHash> {
         let password = password.expose_secret().as_bytes();
         let salt = &SaltString::generate(&mut rand::thread_rng());
         self.hasher()?
@@ -74,7 +58,7 @@ impl Hasher for Argon2Hasher {
             .map_err(Error::Unexpected)
     }
 
-    fn verify_password(
+    pub fn _verify_password(
         &self,
         password: Password,
         hash: PasswordHash,
@@ -85,5 +69,14 @@ impl Hasher for Argon2Hasher {
         self.hasher()?
             .verify_password(password, hash)
             .map_err(|_| Error::InvalidPassword)
+    }
+    fn hasher(&self) -> anyhow::Result<Argon2<'_>> {
+        Argon2::new_with_secret(
+            self.secret.expose_secret().as_bytes(),
+            self.algorithm,
+            self.version,
+            self.params.clone(),
+        )
+        .map_err(anyhow::Error::from)
     }
 }

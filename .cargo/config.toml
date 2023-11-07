@@ -1,5 +1,3 @@
 [alias]
-debug = "test -F log-tests"
-# nextest shows stdout and stderr from first failed test, omits other outputs
-nt = "nextest run -F log-tests"
-qt = "nextest run -F log-tests,skip-io-tests"
+nt = "nextest run"
+qt = "nextest run -F skip-io-tests"

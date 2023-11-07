@@ -2,8 +2,7 @@ use crate::telemetry;
 
 use super::error::Error;
 
-#[derive(Clone, Debug, sqlx::Type)]
-#[sqlx(transparent)]
+#[derive(Clone, Debug)]
 #[cfg_attr(test, derive(fake::Dummy))]
 pub struct Email(
     #[cfg_attr(test, dummy(faker = "fake::faker::internet::en::SafeEmail()"))]

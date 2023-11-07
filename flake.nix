@@ -17,12 +17,9 @@
       in {
         devShells.default = pkgs.mkShellNoCC {
           packages = with pkgs; [
-            docker-compose
             rust-toolchain
             cargo-edit
             cargo-nextest
-            mysql
-            sqlx-cli
           ];
           buildInputs = [ ];
           nativeBuildInputs = with pkgs;
