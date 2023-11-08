@@ -1,5 +1,5 @@
 [package]
-name = "hexagon"
+name = "marine"
 version = "0.1.0"
 edition = "2021"
 publish = false
@@ -32,6 +32,7 @@ serde = { version = "1.0.183", features = ["derive"] }
 serde_with = "3.2.0"
 serde-aux = { version = "4.2.0", default-features = false }
 
+libsql = "0.1.11"
 axum = { version = "0.6.20", features = ["macros"] }
 argon2 = { version = "0.5.2", features = ["std"] }
 

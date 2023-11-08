@@ -6,29 +6,8 @@ use std::net::{SocketAddr, TcpListener};
 
 use anyhow::Context;
 use axum::Router;
-use serde::Deserialize;
-use serde_aux::field_attributes::deserialize_number_from_string;
-use serde_with::serde_as;
 
-use crate::{
-    app::{App, AppConfig},
-    config,
-};
-
-#[serde_as]
-#[derive(Clone, Debug, Deserialize)]
-struct HttpConfig {
-    pub host: [u8; 4],
-    #[serde(deserialize_with = "deserialize_number_from_string")]
-    pub port: u16,
-}
-
-#[derive(Clone, Debug, Deserialize)]
-pub struct HttpServerConfig {
-    #[serde(flatten)]
-    app: AppConfig,
-    http: HttpConfig,
-}
+use crate::{app::App, config::Config};
 
 pub struct HttpServer {
     listener: TcpListener,
@@ -37,7 +16,7 @@ pub struct HttpServer {
 
 impl HttpServer {
     #[tracing::instrument]
-    pub async fn new(config: HttpServerConfig) -> anyhow::Result<Self> {
+    pub async fn new(config: Config) -> anyhow::Result<Self> {
         let app = App::new(config.app).await?;
         let router = router().with_state(app);
         let addr = SocketAddr::from((config.http.host, config.http.port));
@@ -64,10 +43,4 @@ fn router() -> Router<App> {
     Router::new()
         .nest("/auth", auth::router())
         .nest("/health_check", health_check::router())
-}
-
-impl HttpServerConfig {
-    pub fn init() -> anyhow::Result<Self> {
-        config::init()
-    }
 }

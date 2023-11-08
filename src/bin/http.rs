@@ -1,12 +1,9 @@
-use hexagon::{
-    http::{HttpServer, HttpServerConfig},
-    telemetry::init_telemetry,
-};
+use marine::{init_telemetry, Config, HttpServer};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     init_telemetry()?;
-    let config = HttpServerConfig::init()?;
+    let config = Config::init()?;
     let server = HttpServer::new(config).await?;
     server.start().await
 }

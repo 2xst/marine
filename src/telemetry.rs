@@ -27,8 +27,7 @@ fn target_filter() -> Targets {
         .with_target(CRATE_NAME, Level::INFO)
 }
 
-#[allow(unused)]
-pub(crate) async fn instrument_blocking<F, R>(f: F) -> anyhow::Result<R>
+pub async fn _instrument_blocking<F, R>(f: F) -> anyhow::Result<R>
 where
     F: FnOnce() -> R + Send + 'static,
     R: Send + 'static,
@@ -38,12 +37,12 @@ where
         .context("Failed to spawn blocking task")
 }
 
-pub(crate) fn warn<E: std::fmt::Debug>(e: E) -> E {
+pub fn warn<E: std::fmt::Debug>(e: E) -> E {
     tracing::warn!("{e:?}");
     e
 }
 
-pub(crate) fn _error<E: std::fmt::Debug>(e: E) -> E {
+pub fn _error<E: std::fmt::Debug>(e: E) -> E {
     tracing::error!("{e:?}");
     e
 }

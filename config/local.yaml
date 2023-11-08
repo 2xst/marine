@@ -3,6 +3,7 @@ http:
   port: 8080
 
 database:
+  db_url: ":memory:"
 
 hasher:
   secret: ""

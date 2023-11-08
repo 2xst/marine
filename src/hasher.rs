@@ -4,11 +4,13 @@ use argon2::{
     PasswordVerifier, Version,
 };
 use secrecy::{ExposeSecret, Secret};
-use serde::Deserialize;
 
-use crate::domain::{
-    error::{Error, Result},
-    password::{Password, PasswordHash},
+use crate::{
+    config::HasherConfig,
+    domain::{
+        error::{Error, Result},
+        password::{Password, PasswordHash},
+    },
 };
 
 #[derive(Clone)]
@@ -17,15 +19,6 @@ pub struct Hasher {
     algorithm: Algorithm,
     version: Version,
     params: Params,
-}
-
-#[derive(Clone, Debug, Deserialize)]
-pub struct HasherConfig {
-    pub secret: Secret<String>,
-    pub memory_size: u32,
-    pub iterations: u32,
-    pub parallelism_factor: u32,
-    pub output_length: Option<usize>,
 }
 
 impl Hasher {

@@ -2,10 +2,7 @@
 
 use std::net::SocketAddr;
 
-use hexagon::{
-    http::{HttpServer, HttpServerConfig},
-    telemetry::init_telemetry,
-};
+use marine::{init_telemetry, Config, HttpServer};
 use reqwest::{Client, Method, RequestBuilder};
 
 mod health_check;
@@ -18,8 +15,11 @@ struct TestServer {
 impl TestServer {
     async fn start() -> anyhow::Result<Self> {
         init_telemetry()?;
-        std::env::set_var("HTTP__PORT", "0");
-        let config = HttpServerConfig::init()?;
+        let config = {
+            let mut config = Config::init()?;
+            config.http.port = 0;
+            config
+        };
         let server = HttpServer::new(config).await?;
         let address = server.addr()?;
         let http_client = Client::new();
