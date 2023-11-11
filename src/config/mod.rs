@@ -36,7 +36,7 @@ pub struct AppConfig {
 #[derive(Clone, Debug, Deserialize)]
 pub struct DatabaseConfig {
     pub db_url: String,
-    pub auth_token: Option<String>,
+    pub auth_token: Option<Secret<String>>,
 }
 
 #[derive(Clone, Debug, Deserialize)]

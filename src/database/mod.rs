@@ -2,6 +2,7 @@ mod users;
 
 use anyhow::anyhow;
 use libsql::Connection;
+use secrecy::ExposeSecret;
 
 use crate::config::DatabaseConfig;
 
@@ -29,7 +30,7 @@ pub async fn connect_to_db(
         url if url.starts_with("libsql://") => {
             let auth_token = auth_token
                 .ok_or_else(|| anyhow!("Missing database auth token"))?;
-            libsql::Database::open_remote(db_url, auth_token)?
+            libsql::Database::open_remote(db_url, auth_token.expose_secret())?
         }
         _ => libsql::Database::open(db_url)?,
     };
