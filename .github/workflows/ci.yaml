@@ -1,31 +1,23 @@
 name: CI
 
 on:
-  push:
-    branches: main
   pull_request:
     types: [opened, synchronize, reopened]
     branches: main
 
 jobs:
-  check:
+  ci-pass:
+    name: Wait for all jobs to succeed
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Install rust toolchain
-        uses: dtolnay/rust-toolchain@1.72.0
-        with:
-          components: clippy
-
-      - name: Cache rust dependencies
-        uses: Swatinem/rust-cache@v2
-
-      - name: Run linter
-        run: cargo clippy -- -D warnings
+    needs:
+      - test
+      - lint
+      - format
+    steps: 
+      - run: exit 0
 
   test:
+    name: Run tests
     runs-on: ubuntu-latest
     env:
       ENVIRONMENT: local
@@ -52,7 +44,26 @@ jobs:
       - name: Run tests
         run: cargo nextest run
 
+  lint:
+    name: Run linter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install rust toolchain
+        uses: dtolnay/rust-toolchain@1.72.0
+        with:
+          components: clippy
+
+      - name: Cache rust dependencies
+        uses: Swatinem/rust-cache@v2
+
+      - name: Run linter
+        run: cargo clippy -- -D warnings
+
   format:
+    name: Check code formatting
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
