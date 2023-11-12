@@ -20,6 +20,6 @@ RUN apt-get update -y \
     && apt-get autoremove -y \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
-COPY --from=builder /app/target/release/http http
+COPY --from=builder /app/target/release/http /usr/local/bin/app
 COPY config config
-ENTRYPOINT ["./http"]
+ENTRYPOINT ["/usr/local/bin/app"]
