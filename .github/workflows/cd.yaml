@@ -26,6 +26,8 @@ jobs:
         with:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/marine:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/marine:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/marine:buildcache,mode=max
 
   deploy:
     name: Deploy docker image

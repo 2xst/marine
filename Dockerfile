@@ -10,7 +10,10 @@ FROM chef as builder
 COPY --from=planner /app/recipe.json recipe.json
 RUN cargo chef cook --release --recipe-path recipe.json
 
-COPY . .
+COPY .cargo .cargo
+COPY src src
+COPY Cargo.toml Cargo.toml
+COPY Cargo.lock Cargo.lock
 RUN cargo build --bin http --release
 
 FROM debian:bookworm-slim as runtime
@@ -20,6 +23,6 @@ RUN apt-get update -y \
     && apt-get autoremove -y \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
-COPY --from=builder /app/target/release/http http
+COPY --from=builder /app/target/release/http /usr/local/bin/app
 COPY config config
-ENTRYPOINT ["./http"]
+ENTRYPOINT ["/usr/local/bin/app"]
