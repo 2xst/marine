@@ -34,9 +34,21 @@ pub struct AppConfig {
 }
 
 #[derive(Clone, Debug, Deserialize)]
-pub struct DatabaseConfig {
-    pub db_url: String,
-    pub auth_token: Option<Secret<String>>,
+#[serde(tag = "type")]
+pub enum DatabaseConfig {
+    Replicated {
+        db_path: String,
+        sync_url: String,
+        auth_token: Secret<String>,
+    },
+    Remote {
+        db_url: String,
+        auth_token: Secret<String>,
+    },
+    Local {
+        db_url: String,
+    },
+    Memory,
 }
 
 #[derive(Clone, Debug, Deserialize)]

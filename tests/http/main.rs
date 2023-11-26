@@ -1,5 +1,3 @@
-#![cfg(not(feature = "skip-io-tests"))]
-
 use std::net::SocketAddr;
 
 use marine::{init_telemetry, Config, HttpServer};

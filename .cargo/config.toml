@@ -1,3 +1,0 @@
-[alias]
-nt = "nextest run"
-qt = "nextest run -F skip-io-tests"
