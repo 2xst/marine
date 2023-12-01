@@ -4,7 +4,7 @@ use crate::TestServer;
 
 #[tokio::test]
 async fn server_responds() {
-    let server = TestServer::start().await.unwrap();
+    let server = TestServer::start().await;
     let res = server
         .call(Method::GET, "/health_check")
         .send()

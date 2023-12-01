@@ -4,7 +4,7 @@ http:
 
 database:
   type: Local
-  db_url: "local.db"
+  db_path: local.db
 
 hasher:
   secret: ""

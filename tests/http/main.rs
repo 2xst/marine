@@ -11,21 +11,21 @@ struct TestServer {
 }
 
 impl TestServer {
-    async fn start() -> anyhow::Result<Self> {
-        init_telemetry()?;
+    async fn start() -> Self {
+        init_telemetry().unwrap();
         let config = {
-            let mut config = Config::init()?;
+            let mut config = Config::init().unwrap();
             config.http.port = 0;
             config
         };
-        let server = HttpServer::new(config).await?;
-        let address = server.addr()?;
+        let server = HttpServer::new(config).await.unwrap();
+        let address = server.addr().unwrap();
         let http_client = Client::new();
         tokio::spawn(server.start());
-        Ok(Self {
+        Self {
             address,
             http_client,
-        })
+        }
     }
 
     fn call(&self, method: Method, endpoint: &str) -> RequestBuilder {

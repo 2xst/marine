@@ -11,7 +11,7 @@ pub fn read<C: DeserializeOwned>() -> anyhow::Result<C> {
         .get_or_try_init(build_config)?
         .clone()
         .try_deserialize::<C>()
-        .context("Failed to deserialize configuration")
+        .context("failed to deserialize configuration")
 }
 
 fn build_config() -> anyhow::Result<config::Config> {
@@ -19,5 +19,5 @@ fn build_config() -> anyhow::Result<config::Config> {
         .add_source(Environment::init()?.config_file()?)
         .add_source(config::Environment::default().separator("__"))
         .build()
-        .context("Failed to read configuration")
+        .context("failed to read configuration")
 }

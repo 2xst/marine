@@ -46,7 +46,7 @@ pub enum DatabaseConfig {
         auth_token: Secret<String>,
     },
     Local {
-        db_url: String,
+        db_path: String,
     },
     Memory,
 }
