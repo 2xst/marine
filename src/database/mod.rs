@@ -31,7 +31,7 @@ pub async fn connect_to_db(
             libsql::Database::open_remote(db_url, auth_token.expose_secret())?
                 .connect()?
         }
-        DC::Local { db_url } => libsql::Database::open(db_url)?.connect()?,
+        DC::Local { db_path } => libsql::Database::open(db_path)?.connect()?,
         DC::Memory => libsql::Database::open_in_memory()?.connect()?,
     };
     Ok(conn)
