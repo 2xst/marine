@@ -2,10 +2,11 @@ mod auth;
 mod error_response;
 mod health_check;
 
-use std::net::{SocketAddr, TcpListener};
+use std::net::SocketAddr;
 
 use anyhow::Context;
 use axum::Router;
+use tokio::net::TcpListener;
 
 use crate::{app::App, config::Config};
 
@@ -20,16 +21,15 @@ impl HttpServer {
         let app = App::new(config.app).await?;
         let router = router().with_state(app);
         let addr = SocketAddr::from((config.http.host, config.http.port));
-        let listener = TcpListener::bind(addr)?;
+        let listener = TcpListener::bind(addr).await?;
         Ok(Self { listener, router })
     }
 
     #[tracing::instrument(skip(self))]
     pub async fn start(self) -> anyhow::Result<()> {
-        axum::Server::from_tcp(self.listener)?
-            .serve(self.router.into_make_service())
-            .await?;
-        Ok(())
+        axum::serve(self.listener, self.router)
+            .await
+            .context("failed to start HTTP server")
     }
 
     pub fn addr(&self) -> anyhow::Result<SocketAddr> {
