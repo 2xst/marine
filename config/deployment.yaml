@@ -3,8 +3,7 @@ http:
   port: 8080
 
 database:
-  type: Replicated
-  db_path: replica.db
+  type: Remote
 
 hasher:
   secret: ""
