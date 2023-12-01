@@ -35,7 +35,7 @@ impl HttpServer {
     pub fn addr(&self) -> anyhow::Result<SocketAddr> {
         self.listener
             .local_addr()
-            .context("Failed to get TCP listener local address")
+            .context("failed to get TCP listener local address")
     }
 }
 

@@ -16,7 +16,7 @@ pub fn init_telemetry() -> anyhow::Result<()> {
             .with(format)
             .with(target_filter())
             .try_init()
-            .context("Failed to init tracing subscriber")
+            .context("failed to init tracing subscriber")
     })?;
     Ok(())
 }
@@ -34,7 +34,7 @@ where
 {
     tokio::task::spawn_blocking(|| tracing::Span::current().in_scope(f))
         .await
-        .context("Failed to spawn blocking task")
+        .context("failed to spawn blocking task")
 }
 
 pub fn warn<E: std::fmt::Debug>(e: E) -> E {

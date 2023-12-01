@@ -19,7 +19,7 @@ impl Environment {
             .map(|env| Environment::from_str(env.as_str()))?
             .with_context(|| {
                 format!(
-                    "Failed to determine application environment. \
+                    "failed to determine application environment. \
                     Valid options are: {:?}",
                     Environment::VARIANTS
                 )
@@ -30,9 +30,9 @@ impl Environment {
         &self,
     ) -> anyhow::Result<File<FileSourceFile, FileFormat>> {
         std::env::current_dir()
-            .context("Could not determine current working directory")
+            .context("could not determine current working directory")
             .map(|dir| dir.join("config").join(format!("{self}.yaml")))
             .map(File::from)
-            .context("Failed to get the configuration file")
+            .context("failed to get the configuration file")
     }
 }

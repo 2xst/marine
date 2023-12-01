@@ -11,19 +11,19 @@ async fn main() -> anyhow::Result<()> {
     let mut args = std::env::args().skip(1);
     let command = args
         .next()
-        .ok_or_else(|| anyhow!("Missing command"))
+        .ok_or_else(|| anyhow!("missing command"))
         .and_then(Command::new)?;
     match command {
         Command::New => {
             let migration_name = args
                 .next()
-                .ok_or_else(|| anyhow!("Missing migration name"))?;
+                .ok_or_else(|| anyhow!("missing migration name"))?;
             create_migration_files(migration_name)
         }
         Command::Run => {
             let migration_path = args
                 .next()
-                .ok_or_else(|| anyhow!("Missing migration path"))?;
+                .ok_or_else(|| anyhow!("missing migration path"))?;
             run_migration(migration_path).await
         }
     }
