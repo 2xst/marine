@@ -19,6 +19,12 @@ impl TryFrom<String> for Email {
     }
 }
 
+impl AsRef<str> for Email {
+    fn as_ref(&self) -> &str {
+        self.0.as_ref()
+    }
+}
+
 fn validate_email(email: &str) -> bool {
     if email.len() > 50 {
         return false;

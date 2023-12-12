@@ -1,6 +1,5 @@
 use crate::domain::{
     error::Result,
-    token::Token,
     user::{NewUser, NewUserRequest},
 };
 
@@ -13,10 +12,7 @@ impl App {
         let user = NewUser {
             email: req.email.try_into()?,
             password_hash,
-            verification_token: Token::generate(),
-            verified: false,
-            refresh_token: Token::generate(),
         };
-        self.database.create_user(&user).await
+        self.database.insert_user(&user).await
     }
 }

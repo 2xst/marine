@@ -14,5 +14,5 @@ async fn signup(
     State(mut app): State<App>,
     Form(payload): Form<NewUserRequest>,
 ) -> Result<StatusCode> {
-    app.signup(payload).await.map(|_| StatusCode::OK)
+    app.signup(payload).await.map(|_| StatusCode::CREATED)
 }

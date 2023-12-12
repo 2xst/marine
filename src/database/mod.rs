@@ -7,15 +7,29 @@ use crate::config::DatabaseConfig;
 
 #[derive(Clone)]
 pub struct Database {
-    _connection: Connection,
+    connection: Connection,
 }
 
 impl Database {
     pub async fn new(config: DatabaseConfig) -> anyhow::Result<Self> {
         let connection = connect_to_db(config).await?;
-        Ok(Self {
-            _connection: connection,
-        })
+        Ok(Self { connection })
+    }
+
+    #[cfg(test)]
+    pub async fn test() -> Self {
+        use libsql::params;
+
+        let connection = connect_to_db(DatabaseConfig::Memory).await.unwrap();
+        let migrations = std::fs::read_dir("./migrations")
+            .unwrap()
+            .map(Result::unwrap)
+            .filter(|path| path.file_name().to_str().unwrap().ends_with(".up.sql"))
+            .map(|migration| std::fs::read_to_string(migration.path()).unwrap());
+        for sql in migrations {
+            connection.execute(&sql, params!()).await.unwrap();
+        }
+        Self { connection }
     }
 }
 

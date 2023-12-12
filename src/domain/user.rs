@@ -1,7 +1,7 @@
 use secrecy::Secret;
 use serde::Deserialize;
 
-use super::{email::Email, id::Id, password::PasswordHash, token::Token};
+use super::{email::Email, id::Id, password::PasswordHash};
 
 #[derive(Clone, Debug, Deserialize)]
 #[cfg_attr(test, derive(fake::Dummy))]
@@ -16,10 +16,6 @@ pub struct NewUserRequest {
 pub struct NewUser {
     pub email: Email,
     pub password_hash: PasswordHash,
-    pub verification_token: Token,
-    #[cfg_attr(test, dummy(faker = "false"))]
-    pub verified: bool,
-    pub refresh_token: Token,
 }
 
 #[derive(Clone, Debug)]
@@ -28,8 +24,4 @@ pub struct User {
     pub id: Id,
     pub email: Email,
     pub password_hash: PasswordHash,
-    pub verification_token: Token,
-    #[cfg_attr(test, dummy(faker = "false"))]
-    pub verified: bool,
-    pub refresh_token: Token,
 }
