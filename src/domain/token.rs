@@ -12,10 +12,7 @@ impl Token {
 
 #[cfg(test)]
 impl fake::Dummy<fake::Faker> for Token {
-    fn dummy_with_rng<R: fake::Rng + ?Sized>(
-        _: &fake::Faker,
-        _: &mut R,
-    ) -> Self {
+    fn dummy_with_rng<R: fake::Rng + ?Sized>(_: &fake::Faker, _: &mut R) -> Self {
         Self::generate()
     }
 }

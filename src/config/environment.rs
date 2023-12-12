@@ -26,9 +26,7 @@ impl Environment {
             })
     }
 
-    pub fn config_file(
-        &self,
-    ) -> anyhow::Result<File<FileSourceFile, FileFormat>> {
+    pub fn config_file(&self) -> anyhow::Result<File<FileSourceFile, FileFormat>> {
         std::env::current_dir()
             .context("could not determine current working directory")
             .map(|dir| dir.join("config").join(format!("{self}.yaml")))

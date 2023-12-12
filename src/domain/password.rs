@@ -47,10 +47,7 @@ pub struct FakePassword;
 
 #[cfg(test)]
 impl fake::Dummy<FakePassword> for secrecy::Secret<String> {
-    fn dummy_with_rng<R: fake::Rng + ?Sized>(
-        _: &FakePassword,
-        _: &mut R,
-    ) -> Self {
+    fn dummy_with_rng<R: fake::Rng + ?Sized>(_: &FakePassword, _: &mut R) -> Self {
         use fake::{faker::internet::en::Password, Fake};
         Password(8..32 + 1).fake::<String>().into()
     }
@@ -58,10 +55,7 @@ impl fake::Dummy<FakePassword> for secrecy::Secret<String> {
 
 #[cfg(test)]
 impl fake::Dummy<fake::Faker> for PasswordHash {
-    fn dummy_with_rng<R: fake::Rng + ?Sized>(
-        _: &fake::Faker,
-        _: &mut R,
-    ) -> Self {
+    fn dummy_with_rng<R: fake::Rng + ?Sized>(_: &fake::Faker, _: &mut R) -> Self {
         use fake::Fake;
         Self::new((60..64 + 1).fake())
     }

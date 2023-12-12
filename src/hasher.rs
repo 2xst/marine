@@ -1,7 +1,6 @@
 use anyhow::Context;
 use argon2::{
-    password_hash::SaltString, Algorithm, Argon2, Params, PasswordHasher,
-    PasswordVerifier, Version,
+    password_hash::SaltString, Algorithm, Argon2, Params, PasswordHasher, PasswordVerifier, Version,
 };
 use secrecy::{ExposeSecret, Secret};
 
@@ -51,11 +50,7 @@ impl Hasher {
             .map_err(Error::Unexpected)
     }
 
-    pub fn _verify_password(
-        &self,
-        password: Password,
-        hash: PasswordHash,
-    ) -> Result<()> {
+    pub fn _verify_password(&self, password: Password, hash: PasswordHash) -> Result<()> {
         let password = password.expose_secret().as_bytes();
         let hash = &argon2::PasswordHash::new(hash.expose_secret())
             .context("failed to parse hash in PHC string format")?;

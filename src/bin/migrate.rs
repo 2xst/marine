@@ -49,8 +49,7 @@ impl Command {
 
 fn create_migration_files(name: String) -> anyhow::Result<()> {
     let now = Utc::now().format("%Y%m%d%H%M%S").to_string();
-    let files = ["up", "down"]
-        .map(|filetype| format!("migrations/{now}_{name}.{filetype}.sql"));
+    let files = ["up", "down"].map(|filetype| format!("migrations/{now}_{name}.{filetype}.sql"));
     for file in files {
         println!("Creating file: {}", file);
         std::fs::write(file, "")?;

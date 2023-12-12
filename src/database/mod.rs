@@ -19,17 +19,14 @@ impl Database {
     }
 }
 
-pub async fn connect_to_db(
-    config: DatabaseConfig,
-) -> anyhow::Result<Connection> {
+pub async fn connect_to_db(config: DatabaseConfig) -> anyhow::Result<Connection> {
     use DatabaseConfig as DC;
     let conn = match config {
         DC::Replicated { .. } => {
             unimplemented!("wait until libsql is stabilized")
         }
         DC::Remote { db_url, auth_token } => {
-            libsql::Database::open_remote(db_url, auth_token.expose_secret())?
-                .connect()?
+            libsql::Database::open_remote(db_url, auth_token.expose_secret())?.connect()?
         }
         DC::Local { db_path } => libsql::Database::open(db_path)?.connect()?,
         DC::Memory => libsql::Database::open_in_memory()?.connect()?,

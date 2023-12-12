@@ -1,8 +1,7 @@
 use std::fmt;
 
 use secrecy::{
-    zeroize::DefaultIsZeroes, CloneableSecret, DebugSecret, ExposeSecret,
-    Secret, Zeroize,
+    zeroize::DefaultIsZeroes, CloneableSecret, DebugSecret, ExposeSecret, Secret, Zeroize,
 };
 
 pub struct Sensitive<T: Zeroize>(Secret<T>);

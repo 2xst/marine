@@ -4,10 +4,7 @@ use super::error::Error;
 
 #[derive(Clone, Debug)]
 #[cfg_attr(test, derive(fake::Dummy))]
-pub struct Email(
-    #[cfg_attr(test, dummy(faker = "fake::faker::internet::en::SafeEmail()"))]
-    String,
-);
+pub struct Email(#[cfg_attr(test, dummy(faker = "fake::faker::internet::en::SafeEmail()"))] String);
 
 //TODO tests
 impl TryFrom<String> for Email {
@@ -17,8 +14,7 @@ impl TryFrom<String> for Email {
         if validate_email(value.as_str()) {
             Ok(Self(value))
         } else {
-            Err(Error::Validation("unsupported email address"))
-                .map_err(telemetry::warn)
+            Err(Error::Validation("unsupported email address")).map_err(telemetry::warn)
         }
     }
 }
