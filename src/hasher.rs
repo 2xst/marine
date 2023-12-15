@@ -50,7 +50,7 @@ impl Hasher {
             .map_err(Error::Unexpected)
     }
 
-    pub fn _verify_password(&self, password: Password, hash: PasswordHash) -> Result<()> {
+    pub fn verify_password(&self, password: Password, hash: PasswordHash) -> Result<()> {
         let password = password.expose_secret().as_bytes();
         let hash = &argon2::PasswordHash::new(hash.expose_secret())
             .context("failed to parse hash in PHC string format")?;
@@ -58,6 +58,7 @@ impl Hasher {
             .verify_password(password, hash)
             .map_err(|_| Error::InvalidPassword)
     }
+
     fn hasher(&self) -> anyhow::Result<Argon2<'_>> {
         Argon2::new_with_secret(
             self.secret.expose_secret().as_bytes(),

@@ -6,6 +6,12 @@ use super::error::Error;
 #[cfg_attr(test, derive(fake::Dummy))]
 pub struct Email(#[cfg_attr(test, dummy(faker = "fake::faker::internet::en::SafeEmail()"))] String);
 
+impl Email {
+    pub fn new_unchecked(email: String) -> Self {
+        Self(email)
+    }
+}
+
 //TODO tests
 impl TryFrom<String> for Email {
     type Error = Error;

@@ -2,15 +2,19 @@ use anyhow::Context;
 use libsql::params;
 use secrecy::ExposeSecret;
 
-use crate::domain::{
-    error::{Error, Result},
-    user::NewUser,
+use crate::{
+    domain::{
+        email::Email,
+        error::{Error, Result},
+        user::{NewUser, User},
+    },
+    telemetry,
 };
 
 use super::Database;
 
 impl Database {
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(skip(self), err)]
     pub async fn insert_user(&mut self, user: &NewUser) -> Result<()> {
         match self
             .connection
@@ -32,6 +36,37 @@ impl Database {
                 result.context("failed to insert user")?;
                 Ok(())
             }
+        }
+    }
+
+    #[tracing::instrument(skip(self))]
+    pub async fn find_user(&self, email: &Email) -> Result<User> {
+        match self
+            .connection
+            .query(
+                "
+                select u.id
+                     , u.email
+                     , u.password_hash
+                  from users as u
+                 where email = ?
+                 limit 1;
+                ",
+                params!(email.as_ref(),),
+            )
+            .await
+        {
+            // Unique constraint violation
+            Err(libsql::Error::SqliteFailure(2067, _)) => Err(Error::EmailTaken),
+            result => result
+                .context("failed to select from users")
+                .map_err(telemetry::error)?
+                .next()
+                .context("failed to iterate over rows")
+                .map_err(telemetry::error)?
+                .ok_or(Error::NotFound)
+                .map_err(telemetry::warn)
+                .and_then(User::try_from),
         }
     }
 }
@@ -65,5 +100,13 @@ mod tests {
         };
         let res = db.insert_user(&user).await;
         assert!(res.is_err_and(|e| matches!(e, Error::EmailTaken)));
+    }
+
+    #[tokio::test]
+    async fn find_not_found() {
+        init_telemetry().unwrap();
+        let db = Database::test().await;
+        let res = db.find_user(&Faker.fake()).await;
+        assert!(res.is_err_and(|e| matches!(e, Error::NotFound)));
     }
 }

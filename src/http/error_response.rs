@@ -16,6 +16,8 @@ fn status_code(error: &Error) -> StatusCode {
     match error {
         Error::EmailTaken => StatusCode::CONFLICT,
         Error::InvalidPassword => StatusCode::UNAUTHORIZED,
+        Error::NotFound => StatusCode::NOT_FOUND,
+        Error::Unauthorized => StatusCode::UNAUTHORIZED,
         Error::Unexpected(_) => StatusCode::INTERNAL_SERVER_ERROR,
         Error::Validation(_) => StatusCode::UNPROCESSABLE_ENTITY,
     }
