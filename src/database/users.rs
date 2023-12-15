@@ -1,35 +1,112 @@
-use crate::domain::{error::Result, user::NewUser};
+use anyhow::Context;
+use libsql::params;
+use secrecy::ExposeSecret;
+
+use crate::{
+    domain::{
+        email::Email,
+        error::{Error, Result},
+        user::{NewUser, User},
+    },
+    telemetry,
+};
 
 use super::Database;
 
 impl Database {
+    #[tracing::instrument(skip(self), err)]
+    pub async fn insert_user(&mut self, user: &NewUser) -> Result<()> {
+        match self
+            .connection
+            .execute(
+                "
+                insert into users(email, password_hash)
+                values ($1, $2);
+                ",
+                params!(
+                    user.email.as_ref(),
+                    user.password_hash.expose_secret().as_str()
+                ),
+            )
+            .await
+        {
+            // Unique constraint violation
+            Err(libsql::Error::SqliteFailure(2067, _)) => Err(Error::EmailTaken),
+            result => {
+                result.context("failed to insert user")?;
+                Ok(())
+            }
+        }
+    }
+
     #[tracing::instrument(skip(self))]
-    pub async fn create_user(&mut self, user: &NewUser) -> Result<()> {
-        todo!()
+    pub async fn find_user(&self, email: &Email) -> Result<User> {
+        match self
+            .connection
+            .query(
+                "
+                select u.id
+                     , u.email
+                     , u.password_hash
+                  from users as u
+                 where email = ?
+                 limit 1;
+                ",
+                params!(email.as_ref(),),
+            )
+            .await
+        {
+            // Unique constraint violation
+            Err(libsql::Error::SqliteFailure(2067, _)) => Err(Error::EmailTaken),
+            result => result
+                .context("failed to select from users")
+                .map_err(telemetry::error)?
+                .next()
+                .context("failed to iterate over rows")
+                .map_err(telemetry::error)?
+                .ok_or(Error::NotFound)
+                .map_err(telemetry::warn)
+                .and_then(User::try_from),
+        }
     }
 }
 
-// #[cfg(test)]
-// #[cfg(not(feature = "skip-io-tests"))]
-// mod tests {
-//     use fake::{Fake, Faker};
-//
-//     use crate::telemetry::init_test_telemetry;
-//
-//     use super::{Error, Database, NewUser};
-//
-//     #[tokio::test]
-//     async fn reject_duplicate_email() {
-//         init_test_telemetry();
-//         let mut db = todo!();
-//         let user = Faker.fake();
-//         let res = db.create_user(&user).await;
-//         assert!(res.is_ok());
-//         let user = NewUser {
-//             email: user.email,
-//             ..Faker.fake()
-//         };
-//         let res = db.create_user(&user).await;
-//         assert!(res.is_err_and(|e| matches!(e, Error::EmailTaken)));
-//     }
-// }
+#[cfg(test)]
+mod tests {
+    use fake::{Fake, Faker};
+
+    use crate::{domain::error::Error, telemetry::init_telemetry};
+
+    use super::{Database, NewUser};
+
+    #[tokio::test]
+    async fn insert_successful() {
+        init_telemetry().unwrap();
+        let mut db = Database::test().await;
+        let user = Faker.fake();
+        let res = db.insert_user(&user).await;
+        assert!(res.is_ok());
+    }
+
+    #[tokio::test]
+    async fn insert_reject_duplicate_email() {
+        init_telemetry().unwrap();
+        let mut db = Database::test().await;
+        let user = Faker.fake();
+        db.insert_user(&user).await.ok();
+        let user = NewUser {
+            email: user.email,
+            ..Faker.fake()
+        };
+        let res = db.insert_user(&user).await;
+        assert!(res.is_err_and(|e| matches!(e, Error::EmailTaken)));
+    }
+
+    #[tokio::test]
+    async fn find_not_found() {
+        init_telemetry().unwrap();
+        let db = Database::test().await;
+        let res = db.find_user(&Faker.fake()).await;
+        assert!(res.is_err_and(|e| matches!(e, Error::NotFound)));
+    }
+}

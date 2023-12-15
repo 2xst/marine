@@ -8,6 +8,12 @@ pub struct Password(Secret<String>);
 
 pub type PasswordHash = Sensitive<String>;
 
+impl Password {
+    pub fn new_unchecked(password: Secret<String>) -> Self {
+        Self(password)
+    }
+}
+
 impl ExposeSecret<String> for Password {
     fn expose_secret(&self) -> &String {
         self.0.expose_secret()
@@ -20,7 +26,7 @@ impl TryFrom<Secret<String>> for Password {
 
     fn try_from(value: Secret<String>) -> Result<Self, Self::Error> {
         validate_password(value.expose_secret().as_str())
-            .map(|_| Self(value))
+            .map(|_| Self::new_unchecked(value))
             .map_err(Error::Validation)
             .map_err(telemetry::warn)
     }

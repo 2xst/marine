@@ -1277,6 +1277,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "argon2",
+ "async-trait",
  "axum 0.7.2",
  "chrono",
  "config",

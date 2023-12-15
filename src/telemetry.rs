@@ -42,7 +42,7 @@ pub fn warn<E: std::fmt::Debug>(e: E) -> E {
     e
 }
 
-pub fn _error<E: std::fmt::Debug>(e: E) -> E {
+pub fn error<E: std::fmt::Debug>(e: E) -> E {
     tracing::error!("{e:?}");
     e
 }

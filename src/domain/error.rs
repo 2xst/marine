@@ -6,6 +6,10 @@ pub type Result<T> = std::result::Result<T, Error>;
 pub enum Error {
     #[error("email is taken")]
     EmailTaken,
+    #[error("not found")]
+    NotFound,
+    #[error("unauthorized")]
+    Unauthorized,
     #[error("invalid password")]
     InvalidPassword,
     #[error("validation error: {0}")]
