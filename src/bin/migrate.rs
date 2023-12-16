@@ -62,6 +62,8 @@ async fn run_migration(path: String) -> anyhow::Result<()> {
     let script = std::fs::read_to_string(path)?;
     let config = marine::Config::init()?.app.database;
     let connection = marine::connect_to_db(config).await?;
-    connection.execute(&script, params!()).await?;
+    for command in script.trim().trim_end_matches(';').split(';') {
+        connection.execute(command, params!()).await?;
+    }
     Ok(())
 }
