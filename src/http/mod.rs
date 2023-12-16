@@ -1,4 +1,5 @@
 mod auth;
+mod partners;
 mod error_response;
 mod health_check;
 
@@ -42,5 +43,6 @@ impl HttpServer {
 fn router() -> Router<App> {
     Router::new()
         .nest("/auth", auth::router())
+        .nest("/partners", partners::router())
         .nest("/health_check", health_check::router())
 }

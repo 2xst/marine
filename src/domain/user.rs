@@ -12,6 +12,14 @@ pub struct NewUserRequest {
     pub password: Secret<String>,
 }
 
+#[derive(Clone, Debug, Deserialize)]
+#[cfg_attr(test, derive(fake::Dummy))]
+pub struct LoginRequest {
+    pub ident: String,
+    #[cfg_attr(test, dummy(faker = "super::password::FakePassword"))]
+    pub password: Secret<String>,
+}
+
 #[derive(Clone, Debug)]
 #[cfg_attr(test, derive(fake::Dummy))]
 pub struct NewUser {

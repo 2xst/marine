@@ -1,4 +1,5 @@
 mod users;
+mod partners;
 
 use crate::{config::AppConfig, database::Database, hasher::Hasher};
 

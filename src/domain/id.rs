@@ -4,12 +4,12 @@ use axum::{
     http::{header, request::Parts},
 };
 
-use crate::tokens::parse_id;
+use crate::tokens::{generate_tokens, parse_id};
 
 use super::error::Error;
 
-#[derive(Clone, Debug)]
-pub struct Id(u64);
+#[derive(Clone, Debug, PartialEq)]
+pub struct Id(pub u64);
 
 impl Id {
     pub fn new(id: u64) -> Self {
@@ -18,6 +18,24 @@ impl Id {
 
     pub fn inner(&self) -> u64 {
         self.0
+    }
+}
+
+impl serde::Serialize for Id {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        generate_tokens(self).access_token.serialize(serializer)
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for Id {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        String::deserialize(deserializer).map(|s| parse_id(&s))
     }
 }
 

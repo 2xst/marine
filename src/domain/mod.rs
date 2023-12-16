@@ -3,5 +3,6 @@ pub mod error;
 pub mod id;
 pub mod password;
 pub mod user;
+pub mod partners;
 
 mod sensitive;

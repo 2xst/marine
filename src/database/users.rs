@@ -4,7 +4,6 @@ use secrecy::ExposeSecret;
 
 use crate::{
     domain::{
-        email::Email,
         error::{Error, Result},
         user::{NewUser, User},
     },
@@ -14,7 +13,7 @@ use crate::{
 use super::Database;
 
 impl Database {
-    #[tracing::instrument(skip(self), err)]
+    #[tracing::instrument(skip(self))]
     pub async fn insert_user(&mut self, user: &NewUser) -> Result<()> {
         match self
             .connection
@@ -40,9 +39,8 @@ impl Database {
     }
 
     #[tracing::instrument(skip(self))]
-    pub async fn find_user(&self, email: &Email) -> Result<User> {
-        match self
-            .connection
+    pub async fn find_user(&self, ident: &str) -> Result<User> {
+        self.connection
             .query(
                 "
                 select u.id
@@ -50,24 +48,25 @@ impl Database {
                      , u.password_hash
                   from users as u
                  where email = ?
+                 union 
+                 select p.id
+                      , p.name
+                      , p.password_hash
+                 from partners as p
+                 where name = ?
                  limit 1;
                 ",
-                params!(email.as_ref(),),
+                params!(ident),
             )
             .await
-        {
-            // Unique constraint violation
-            Err(libsql::Error::SqliteFailure(2067, _)) => Err(Error::EmailTaken),
-            result => result
-                .context("failed to select from users")
-                .map_err(telemetry::error)?
-                .next()
-                .context("failed to iterate over rows")
-                .map_err(telemetry::error)?
-                .ok_or(Error::NotFound)
-                .map_err(telemetry::warn)
-                .and_then(User::try_from),
-        }
+            .context("failed to select from users")
+            .map_err(telemetry::error)?
+            .next()
+            .context("failed to iterate over rows")
+            .map_err(telemetry::error)?
+            .ok_or(Error::NotFound)
+            .map_err(telemetry::warn)
+            .and_then(User::try_from)
     }
 }
 
@@ -106,7 +105,7 @@ mod tests {
     async fn find_not_found() {
         init_telemetry().unwrap();
         let db = Database::test().await;
-        let res = db.find_user(&Faker.fake()).await;
+        let res = db.find_user(fake::faker::lorem::en::Word().fake()).await;
         assert!(res.is_err_and(|e| matches!(e, Error::NotFound)));
     }
 }

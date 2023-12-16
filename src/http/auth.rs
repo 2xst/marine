@@ -4,7 +4,7 @@ use crate::{
     app::App,
     domain::{
         error::Result,
-        user::{AuthTokens, NewUserRequest},
+        user::{AuthTokens, NewUserRequest, LoginRequest},
     },
 };
 
@@ -25,7 +25,7 @@ async fn signup(
 #[tracing::instrument(skip(app))]
 async fn login(
     State(mut app): State<App>,
-    Form(payload): Form<NewUserRequest>,
+    Form(payload): Form<LoginRequest>,
 ) -> Result<Json<AuthTokens>> {
     app.login(payload).await.map(Json)
 }
