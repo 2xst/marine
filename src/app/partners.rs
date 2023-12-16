@@ -1,4 +1,4 @@
-use crate::domain::{partners::Partner, error::Result, id::Id};
+use crate::domain::{error::Result, id::Id, partners::Partner};
 
 use super::App;
 

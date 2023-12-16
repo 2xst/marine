@@ -1,5 +1,5 @@
-mod users;
 mod partners;
+mod users;
 
 use libsql::Connection;
 use secrecy::ExposeSecret;

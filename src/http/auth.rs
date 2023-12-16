@@ -4,7 +4,7 @@ use crate::{
     app::App,
     domain::{
         error::Result,
-        user::{AuthTokens, NewUserRequest, LoginRequest},
+        user::{AuthTokens, LoginRequest, NewUserRequest},
     },
 };
 

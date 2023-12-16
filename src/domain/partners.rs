@@ -23,7 +23,6 @@ pub struct Location {
 impl TryFrom<libsql::Row> for Partner {
     type Error = super::error::Error;
 
-
     fn try_from(row: libsql::Row) -> Result<Self, Self::Error> {
         let id = row
             .get::<u64>(0)
@@ -61,6 +60,11 @@ impl TryFrom<libsql::Row> for Location {
         let address = row
             .get::<String>(3)
             .context("failed to get address from row")?;
-        Ok(Self { id, country, city, address })
+        Ok(Self {
+            id,
+            country,
+            city,
+            address,
+        })
     }
 }

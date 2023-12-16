@@ -1,7 +1,11 @@
-use crate::{domain::{
-    error::Result,
-    user::{NewUser, NewUserRequest, AuthTokens, LoginRequest}, password::Password,
-}, tokens::generate_tokens};
+use crate::{
+    domain::{
+        error::Result,
+        password::Password,
+        user::{AuthTokens, LoginRequest, NewUser, NewUserRequest},
+    },
+    tokens::generate_tokens,
+};
 
 use super::App;
 

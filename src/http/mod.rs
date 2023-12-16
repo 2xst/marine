@@ -1,7 +1,7 @@
 mod auth;
-mod partners;
 mod error_response;
 mod health_check;
+mod partners;
 
 use std::net::SocketAddr;
 
