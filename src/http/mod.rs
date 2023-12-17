@@ -3,6 +3,7 @@ mod error_response;
 mod health_check;
 mod locations;
 mod partners;
+mod records;
 
 use std::net::SocketAddr;
 
@@ -46,5 +47,6 @@ fn router() -> Router<App> {
         .nest("/auth", auth::router())
         .nest("/partners", partners::router())
         .nest("/locations", locations::router())
+        .nest("/records", records::router())
         .nest("/health_check", health_check::router())
 }

@@ -4,7 +4,7 @@ use axum::{
     http::{header, request::Parts},
 };
 
-use crate::tokens::{generate_tokens, parse_id};
+use crate::tokens::{obfuscate_id, parse_id, parse_token};
 
 use super::error::Error;
 
@@ -26,7 +26,7 @@ impl serde::Serialize for Id {
     where
         S: serde::Serializer,
     {
-        generate_tokens(self).access_token.serialize(serializer)
+        obfuscate_id(self).serialize(serializer)
     }
 }
 
@@ -48,7 +48,7 @@ impl<S> FromRequestParts<S> for Id {
             .headers
             .get(header::AUTHORIZATION)
             .and_then(|value| value.to_str().ok())
-            .map(parse_id)
+            .map(parse_token)
             .ok_or(Error::Unauthorized)
     }
 }

@@ -5,6 +5,7 @@ use secrecy::ExposeSecret;
 use crate::{
     domain::{
         error::{Error, Result},
+        id::Id,
         user::{NewUser, User},
     },
     telemetry,
@@ -33,6 +34,34 @@ impl Database {
             Err(libsql::Error::SqliteFailure(2067, _)) => Err(Error::EmailTaken),
             result => {
                 result.context("failed to insert user")?;
+                Ok(())
+            }
+        }
+    }
+
+    #[tracing::instrument(skip(self))]
+    pub async fn update_user(&mut self, id: &Id, user: &NewUser) -> Result<()> {
+        match self
+            .connection
+            .execute(
+                "
+                update users
+                   set email = ?
+                     , password_hash = ?
+                where id = ?;
+                ",
+                params!(
+                    user.email.as_ref(),
+                    user.password_hash.expose_secret().as_str(),
+                    id.0 as i32
+                ),
+            )
+            .await
+        {
+            // Unique constraint violation
+            Err(libsql::Error::SqliteFailure(2067, _)) => Err(Error::EmailTaken),
+            result => {
+                result.context("failed to update user")?;
                 Ok(())
             }
         }

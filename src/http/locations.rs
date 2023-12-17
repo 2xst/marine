@@ -28,7 +28,6 @@ pub async fn get_one(Path(id): Path<Id>, State(app): State<App>) -> Result<Json<
     app.get_location(&id).await.map(Json)
 }
 
-#[axum::debug_handler]
 #[tracing::instrument(skip(app))]
 pub async fn create_location(
     user: Id,
