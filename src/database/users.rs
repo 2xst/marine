@@ -48,7 +48,7 @@ impl Database {
                 update users
                    set email = ?
                      , password_hash = ?
-                where id = ?;
+                 where id = ?;
                 ",
                 params!(
                     user.email.as_ref(),
@@ -78,10 +78,10 @@ impl Database {
                   from users as u
                  where u.email = ?
                  union 
-                 select p.id
-                      , p.name
-                      , p.password_hash
-                 from partners as p
+                select p.id
+                     , p.name
+                     , p.password_hash
+                  from partners as p
                  where p.name = ?
                  limit 1;
                 ",
