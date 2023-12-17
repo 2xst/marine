@@ -21,6 +21,7 @@ pub fn router() -> Router<App> {
         .route("/", post(create_record))
         .route("/", put(update_record))
         .route("/", get(get_many))
+        .route("/stress_koefficient", get(stress_koefficient))
 }
 
 #[tracing::instrument(skip(app))]
@@ -61,4 +62,27 @@ pub struct Quer {
 #[tracing::instrument(skip(app))]
 pub async fn get_many(Query(q): Query<Quer>, State(app): State<App>) -> Result<Json<Vec<Record>>> {
     app.get_records(&q.user).await.map(Json)
+}
+
+#[derive(Debug, serde::Serialize)]
+pub struct Stuff {
+    record: Record,
+    stress_koefficient: f64,
+}
+
+#[tracing::instrument(skip(app))]
+pub async fn stress_koefficient(
+    Query(q): Query<Quer>,
+    State(app): State<App>,
+) -> Result<Json<Stuff>> {
+    app.get_records(&q.user)
+        .await
+        .map(|v| v.into_iter().max_by_key(|x| x.max_pressure).unwrap())
+        .map(|r| Stuff {
+            record: r.clone(),
+            stress_koefficient: (r.max_pressure as f64 / r.depth as f64 / 8492f64 * 100f64) as u64
+                as f64
+                / 100f64,
+        })
+        .map(Json)
 }
