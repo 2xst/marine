@@ -3,7 +3,7 @@ use crate::{
         error::Result,
         id::Id,
         password::Password,
-        user::{AuthTokens, LoginRequest, NewUser, NewUserRequest},
+        user::{AuthTokens, LoginRequest, NewUser, NewUserRequest, User},
     },
     tokens::generate_tokens,
 };
@@ -19,6 +19,11 @@ impl App {
             password_hash,
         };
         self.database.insert_user(&user).await
+    }
+
+    #[tracing::instrument(skip(self))]
+    pub async fn get_user(&self, id: &Id) -> Result<User> {
+        self.database.find_user_by_id(id).await
     }
 
     #[tracing::instrument(skip(self))]

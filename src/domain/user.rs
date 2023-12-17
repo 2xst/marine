@@ -27,11 +27,12 @@ pub struct NewUser {
     pub password_hash: PasswordHash,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 #[cfg_attr(test, derive(fake::Dummy))]
 pub struct User {
     pub id: Id,
     pub email: Email,
+    #[serde(skip_serializing)]
     pub password_hash: PasswordHash,
 }
 

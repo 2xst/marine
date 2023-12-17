@@ -1,7 +1,7 @@
 use axum::{
     extract::State,
     http::StatusCode,
-    routing::{post, put},
+    routing::{get, post, put},
     Form, Json, Router,
 };
 
@@ -10,7 +10,7 @@ use crate::{
     domain::{
         error::Result,
         id::Id,
-        user::{AuthTokens, LoginRequest, NewUserRequest},
+        user::{AuthTokens, LoginRequest, NewUserRequest, User},
     },
 };
 
@@ -19,6 +19,7 @@ pub fn router() -> Router<App> {
         .route("/signup", post(signup))
         .route("/login", post(login))
         .route("/update", put(update_credentials))
+        .route("/me", get(me))
 }
 
 #[tracing::instrument(skip(app))]
@@ -44,4 +45,13 @@ async fn update_credentials(
     Form(payload): Form<NewUserRequest>,
 ) -> Result<()> {
     app.update_credentials(&user, payload).await
+}
+
+#[derive(serde::Serialize)]
+pub struct IdResponse {
+    pub id: Id,
+}
+
+async fn me(user: Id, State(app): State<App>) -> Result<Json<User>> {
+    app.get_user(&user).await.map(Json)
 }

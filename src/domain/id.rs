@@ -44,12 +44,15 @@ impl<S> FromRequestParts<S> for Id {
     type Rejection = Error;
 
     async fn from_request_parts(parts: &mut Parts, _: &S) -> Result<Self, Self::Rejection> {
-        parts
+        let token = parts
             .headers
             .get(header::AUTHORIZATION)
             .and_then(|value| value.to_str().ok())
-            .map(parse_token)
-            .ok_or(Error::Unauthorized)
+            .unwrap_or_default();
+        if token.is_empty() {
+            return Err(Error::Unauthorized);
+        }
+        Ok(parse_token(token))
     }
 }
 

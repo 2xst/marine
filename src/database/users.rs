@@ -68,6 +68,37 @@ impl Database {
     }
 
     #[tracing::instrument(skip(self))]
+    pub async fn find_user_by_id(&self, id: &Id) -> Result<User> {
+        self.connection
+            .query(
+                "
+                select u.id
+                     , u.email
+                     , u.password_hash
+                  from users as u
+                 where u.id = ?
+                 union 
+                select p.id
+                     , p.name
+                     , p.password_hash
+                  from partners as p
+                 where p.id = ?
+                 limit 1;
+                ",
+                params!(id.0 as i32, id.0 as i32),
+            )
+            .await
+            .context("failed to select from users")
+            .map_err(telemetry::error)?
+            .next()
+            .context("failed to iterate over rows")
+            .map_err(telemetry::error)?
+            .ok_or(Error::NotFound)
+            .map_err(telemetry::warn)
+            .and_then(User::try_from)
+    }
+
+    #[tracing::instrument(skip(self))]
     pub async fn find_user(&self, ident: &str) -> Result<User> {
         self.connection
             .query(
