@@ -47,16 +47,16 @@ impl Database {
                      , u.email
                      , u.password_hash
                   from users as u
-                 where email = ?
+                 where u.email = ?
                  union 
                  select p.id
                       , p.name
                       , p.password_hash
                  from partners as p
-                 where name = ?
+                 where p.name = ?
                  limit 1;
                 ",
-                params!(ident),
+                params!(ident, ident),
             )
             .await
             .context("failed to select from users")

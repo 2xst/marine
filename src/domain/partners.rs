@@ -1,5 +1,5 @@
 use anyhow::Context;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use super::{id::Id, password::PasswordHash, sensitive::Sensitive};
 
@@ -12,7 +12,22 @@ pub struct Partner {
     pub locations: Vec<Location>,
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug)]
+pub struct NewLocation {
+    pub country: String,
+    pub city: String,
+    pub address: String,
+    pub partner_id: Id,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+pub struct NewLocationRequest {
+    pub country: String,
+    pub city: String,
+    pub address: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Location {
     pub id: Id,
     pub country: String,
