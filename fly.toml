@@ -7,7 +7,7 @@ app = "marine"
 primary_region = "ams"
 
 [build]
-image = "grimerssy/marine:latest"
+image = "purged/marine:latest"
 
 [http_service]
   internal_port = 8080
